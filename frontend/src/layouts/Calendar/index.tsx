@@ -32,6 +32,7 @@ export class Calendar extends Component<CalendarProps, CalendarState> {
     this.handleIncMonth.bind(this);
     this.handleDecMonth.bind(this);
     this.handleDayClick.bind(this);
+    this.loadEventDay.bind(this);
   }
 
   componentDidMount() {
@@ -62,10 +63,15 @@ export class Calendar extends Component<CalendarProps, CalendarState> {
       ...this.state,
       checkedDate: new Date(this.state.date.getFullYear(), month, day),
     });
+    // see events of the day
+    this.loadEventDay(this.state.date.getFullYear(), month, day);
+  }
+
+  private loadEventDay(year: number, month: number, day: number) {
     // Increment the month to compatibility of reading in request
-    api.get(`/event/${this.state.date.getFullYear()}/${month + 1}/${day}`)
+    api.get(`/event/${year}/${month + 1}/${day}`)
       .then(response => {
-        this.props.handleEvents(new Date(this.state.date.getFullYear(), month, day), response.data);
+        this.props.handleEvents(new Date(year, month, day), response.data);
       })
       .catch(err => {
         toast.error(`Identified error in request events day. ${String.fromCodePoint(0x1F615)}\n'${err?.response?.data?.message ?? err}'`);
@@ -97,7 +103,7 @@ export class Calendar extends Component<CalendarProps, CalendarState> {
       if (daysWeek[tempWeek].length % ConstCalendar.days.length === 0) daysWeek[++tempWeek] = [];
         daysWeek[tempWeek].push(<CardDay day={ i + 1 } month={ month } onHandleClick={ this.handleDayClick.bind(this) }
           dateChecked={ this.state.checkedDate?.getMonth() === month && this.state.checkedDate?.getDate() === i + 1 }
-          dateNow={ now.getMonth() === month && now.getDate() === i + 1 } />);
+          dateNow={ now.getFullYear() === year && now.getMonth() === month && now.getDate() === i + 1 } />);
     }
 
     // Verificar se nem todas as semanas do mês foram definidas 
@@ -134,11 +140,13 @@ export class Calendar extends Component<CalendarProps, CalendarState> {
   }
 
   private handleMonthNow() {
+    const date = new Date();
     this.setState({
       ...this.state,
-      date: new Date(),
+      date,
+      checkedDate: date,
     });
-    this.handleDayClick(this.state.date.getMonth(), this.state.date.getDate())
+    this.loadEventDay(date.getFullYear(), date.getMonth(), date.getDate());
   }
 
   private handleIncMonth() {
