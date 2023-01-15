@@ -48,6 +48,12 @@ Instale as dependências
   npm install
 ```
 
+Executar a migration no prisma para criar o banco de dados
+
+```bash
+npx prisma migrate dev --name init
+```
+
 Inicie o servidor
 
 ```bash
