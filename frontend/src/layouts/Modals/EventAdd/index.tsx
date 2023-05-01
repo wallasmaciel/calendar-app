@@ -48,7 +48,7 @@ export class ModalEventAdd extends Component<ModalEventAddProps, ModalEventAddSt
     }
 
     api.post('/event', {
-      date: this.props.date.getFullYear() + '-' + this.props.date.getMonth() + 1 + '-' + this.props.date.getDate(),
+      date: this.props.date.getFullYear() + '-' + (this.props.date.getMonth() + 1) + '-' + this.props.date.getDate(),
       title: this.state.title,
       description: this.state.description,
     }).then(response => {
